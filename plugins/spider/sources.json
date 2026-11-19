@@ -1,0 +1,11 @@
+{
+  "sources": [
+    {"name": "openai", "kind": "rss", "url": "https://openai.com/news/rss.xml"},
+    {"name": "google-deepmind", "kind": "rss", "url": "https://deepmind.google/blog/rss.xml"},
+    {"name": "claude-code", "kind": "github_releases", "repo": "anthropics/claude-code"},
+    {"name": "openai-codex", "kind": "github_releases", "repo": "openai/codex"},
+    {"name": "gemini-cli", "kind": "github_releases", "repo": "google-gemini/gemini-cli"},
+    {"name": "hacker-news", "kind": "hn", "min_points": 150},
+    {"name": "hf-daily-papers", "kind": "hf_daily_papers", "min_upvotes": 25}
+  ]
+}

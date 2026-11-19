@@ -1,0 +1,14 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "tangled-shore",
+  "owner": {
+    "name": "Kelly White"
+  },
+  "plugins": [
+    {
+      "name": "spider",
+      "description": "A twice-daily AI news digest for Slack, judged and written by one Claude session, with every link checked.",
+      "source": "./plugins/spider"
+    }
+  ]
+}

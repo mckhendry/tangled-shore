@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Rendered by install.sh, which replaces each at-sign placeholder. Runs Spider every day (Weekday 1-7, Sunday is 7)
+     at each slot in schedule.json, local time (the Mac's clock must be on config.json's time_zone). Slots missed while the Mac slept fire once on wake; the run
+     belongs to the latest slot at or before its start, so two missed slots make one post. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>@LABEL@</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>-B</string>
+    <string>@BIN@/spider.py</string>
+    <string>run</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <!-- The claude binary install.sh found, since launchd's PATH does not include it. -->
+    <key>SPIDER_CLAUDE</key>
+    <string>@CLAUDE@</string>
+    <!-- yt-dlp, for a creator whose RSS feed fails (empty when install.sh found none). -->
+    <key>SPIDER_YTDLP</key>
+    <string>@YTDLP@</string>
+    <key>PATH</key>
+    <string>@CLAUDE_DIR@:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>StartCalendarInterval</key>
+  <array>
+@SCHEDULE@
+  </array>
+  <key>ProcessType</key>
+  <string>Background</string>
+  <key>StandardOutPath</key>
+  <string>@STATE@/launchd.log</string>
+  <key>StandardErrorPath</key>
+  <string>@STATE@/launchd.log</string>
+</dict>
+</plist>

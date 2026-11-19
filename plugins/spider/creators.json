@@ -1,0 +1,16 @@
+{
+  "_note": "The YouTube creators Spider watches, one {\"name\", \"channel_id\"} entry each; re-run install.sh after editing. The starter list favors hands-on model and dev-tool coverage over hype.",
+  "creators": [
+    {"name": "Matthew Berman", "channel_id": "UCawZsQWqfGSbCI5yjkdVkTA"},
+    {"name": "AI Explained", "channel_id": "UCNJ1Ymd5yFuUPtn21xtRbbw"},
+    {"name": "IndyDevDan", "channel_id": "UC_x36zCEGilGpB1m-V4gmjg"},
+    {"name": "Cole Medin", "channel_id": "UCMwVTLZIRRUyyVrkjDpn4pA"},
+    {"name": "Theo - t3.gg", "channel_id": "UCbRP3c757lWg9M-U7TyEkXA"},
+    {"name": "Fireship", "channel_id": "UCsBjURrPoezykLs9EqgamOA"},
+    {"name": "Claude (Anthropic)", "channel_id": "UCV03SRZXJEz-hchIAogeJOg"},
+    {"name": "Latent Space", "channel_id": "UCxBcwypKK-W3GHd_RZ9FZrQ"},
+    {"name": "Sam Witteveen", "channel_id": "UC55ODQSvARtgSyc8ThfiepQ"},
+    {"name": "Prompt Engineering", "channel_id": "UCDq7SjbgRKty5TgGafW8Clg"},
+    {"name": "Nate B Jones", "channel_id": "UC0C-17n9iuUQPylguM1d-lQ"}
+  ]
+}
