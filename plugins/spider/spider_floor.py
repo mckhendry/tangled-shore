@@ -256,7 +256,8 @@ def vouched(url, kind, src):
 def run_floor(sources, creators, start, ledger, fetch=http_get, clock=time.time):
     """Pull every source. Returns (candidates, statuses). A failed source never stops the others."""
     jobs = [(s.get("name", "?"), s.get("kind"), s) for s in sources.get("sources", [])]
-    jobs += [("youtube:%s" % c.get("name", c["channel_id"]), "youtube", c) for c in creators.get("creators", [])]
+    jobs += [("youtube:%s" % c.get("name", c.get("channel_id", "#%d" % i)), "youtube", c)
+             for i, c in enumerate(creators.get("creators", []))]
     deadline = clock() + FLOOR_BUDGET_S
     merged, statuses = {}, []
     for name, kind, src in jobs:

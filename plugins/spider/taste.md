@@ -1,7 +1,7 @@
 # What the reader wants from Spider
 
 This is one reader's example: the profile Spider was first tuned on. Rewrite it for yourself. The judge's prompt
-reads this file as written, in priority order, and calls the reader by the `reader` name in `config.json`.
+reads this file as written, in priority order.
 
 The reader is an engineer who builds with Claude Code every day. They read each post in about two minutes and want to know what changed in AI since the last post that matters to them. In priority order:
 

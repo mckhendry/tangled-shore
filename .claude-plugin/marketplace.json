@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "spider",
-      "description": "A twice-daily AI news digest for Slack, judged and written by one Claude session, with every link checked.",
+      "description": "A twice-daily AI news digest for Slack, judged and written by one Claude session, with every link checked or listed by its own publisher's feed.",
       "source": "./plugins/spider"
     }
   ]

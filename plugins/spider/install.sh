@@ -48,7 +48,7 @@ if ! /usr/bin/python3 -B -c \
 fi
 
 mkdir -p -m 700 "$BIN_DIR" "$STATE_DIR"
-# The first install's time, kept across re-installs: a dead-man check never calls a slot before it "has no result".
+# The first install's time, kept across re-installs: a dead-man check never counts a slot from before the install as missing.
 [ -s "$STATE_DIR/installed" ] || date +%s > "$STATE_DIR/installed"
 for f in $FILES; do
   install -m 600 "$HERE/$f" "$BIN_DIR/$f"

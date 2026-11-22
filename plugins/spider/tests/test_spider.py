@@ -185,6 +185,15 @@ class FloorTests(unittest.TestCase):
         self.assertTrue(cands)
         self.assertFalse(floor.all_failed(statuses))
 
+    def test_a_creator_missing_channel_id_fails_alone_by_name_or_index(self):
+        creators = {"creators": [{"name": "no-id"}, {}]}
+        cands, statuses = floor.run_floor(self.sources(), creators, self.START, set(), fetch=self.fetcher(self.table()))
+        by_name = {s["name"]: s["status"] for s in statuses}
+        self.assertEqual(by_name["youtube:no-id"], "failed")
+        self.assertEqual(by_name["youtube:#1"], "failed")
+        self.assertEqual(by_name["openai"], "ok")
+        self.assertTrue(cands)
+
     def test_a_source_with_nothing_in_the_window_is_empty_not_failed(self):
         cands, statuses = floor.run_floor(self.sources(), {"creators": []}, wall(2026, 11, 5, 0), set(),
                                           fetch=self.fetcher(self.table()))
@@ -778,10 +787,10 @@ class PublishTests(unittest.TestCase):
 
 
 class ConfigTests(unittest.TestCase):
-    """config.json: the channel, the Keychain item, the zone and the reader, read once at import."""
+    """config.json: the channel, the Keychain item and the zone, read once at import."""
 
     GOOD = {"slack_channel": "C1", "keychain_service": "svc", "keychain_account": "acct",
-            "time_zone": "America/New_York", "reader": "Sam"}
+            "time_zone": "America/New_York"}
 
     def load(self, value):
         d = tempfile.mkdtemp()
@@ -796,15 +805,16 @@ class ConfigTests(unittest.TestCase):
             self.assertEqual(state.CONFIG, json.load(f))
         self.assertEqual((post.CHANNEL, post.KEYCHAIN_SERVICE, post.KEYCHAIN_ACCOUNT),
                          tuple(state.CONFIG[k] for k in ("slack_channel", "keychain_service", "keychain_account")))
-        self.assertEqual(judge.READER, state.CONFIG["reader"])
         self.assertEqual(state.TZ, state.ZoneInfo(state.CONFIG["time_zone"]))
 
     def test_a_good_file_loads(self):
         self.assertEqual(self.load(self.GOOD), self.GOOD)
 
     def test_a_bad_file_is_refused(self):
-        for bad in (dict(self.GOOD, extra="x"), {k: v for k, v in self.GOOD.items() if k != "reader"},
-                    dict(self.GOOD, reader=""), dict(self.GOOD, slack_channel=7),
+        # reader was a key until the prompt stopped naming the reader; a file still carrying it is an extra key.
+        for bad in (dict(self.GOOD, extra="x"), dict(self.GOOD, reader="Sam"),
+                    {k: v for k, v in self.GOOD.items() if k != "keychain_account"},
+                    dict(self.GOOD, keychain_account=""), dict(self.GOOD, slack_channel=7),
                     dict(self.GOOD, time_zone="Mars/Olympus"), dict(self.GOOD, time_zone="../etc"), []):
             with self.assertRaises(ValueError, msg=bad):
                 self.load(bad)
@@ -814,14 +824,12 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(state.zone_offset_s(wall(2026, 7, 1, 12), ny), -4 * 3600)
         self.assertEqual(state.zone_offset_s(wall(2026, 12, 1, 12), ny), -5 * 3600)
 
-    def test_the_prompt_writes_to_the_configured_reader_in_the_configured_zone(self):
+    def test_the_prompt_writes_to_the_reader_as_you_in_the_configured_zone(self):
         prompt = judge.build_prompt("A", "B", "taste", [], [], [])
-        self.assertIn("what changed in AI for %s." % judge.READER, prompt)
+        self.assertIn("what changed in AI for the reader.", prompt)
         self.assertIn("(%s time)" % state.CONFIG["time_zone"], prompt)
-        self.assertIn('never "%s"' % judge.READER, prompt)
+        self.assertIn('never by name or as "the reader"', prompt)
         self.assertNotIn("{reader}", prompt)
-        with mock.patch.object(judge, "READER", "Sam"):
-            self.assertIn('never "Sam"', judge.build_prompt("A", "B", "taste", [], [], []))
 
 
 class KeychainTokenTests(unittest.TestCase):
@@ -1380,7 +1388,7 @@ class InstallTests(unittest.TestCase):
     def test_install_refuses_without_a_token_in_the_keychain(self):
         proc = self.run_install(token=False)
         self.assertNotEqual(proc.returncode, 0)
-        self.assertIn("spider-slack-bot", proc.stderr)
+        self.assertIn(post.KEYCHAIN_SERVICE, proc.stderr)
         self.assertFalse(os.path.exists(self.calls))
 
     def test_install_never_runs_spider_itself(self):

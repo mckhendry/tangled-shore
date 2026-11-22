@@ -1,7 +1,7 @@
 {
   "name": "spider",
   "version": "1.0.0",
-  "description": "A twice-daily AI news digest for Slack: pulls lab feeds, release notes, Hacker News, Hugging Face papers and YouTube creators, has one Claude session judge and write it, checks every link, and posts.",
+  "description": "A twice-daily AI news digest for Slack: pulls lab feeds, release notes, Hacker News, Hugging Face papers and YouTube creators, has one Claude session judge and write it, checks every link answers or is listed by its own publisher's feed, and posts.",
   "author": {"name": "Kelly White"},
   "repository": "https://github.com/mckhendry/tangled-shore",
   "license": "MIT"

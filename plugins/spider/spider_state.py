@@ -22,14 +22,14 @@ UTC = timezone.utc
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCHEDULE_FILE = os.path.join(HERE, "schedule.json")
 CONFIG_FILE = os.path.join(HERE, "config.json")
-CONFIG_KEYS = ("slack_channel", "keychain_service", "keychain_account", "time_zone", "reader")
+CONFIG_KEYS = ("slack_channel", "keychain_service", "keychain_account", "time_zone")
 
 
 def load_config(path=CONFIG_FILE):
     """The settings one install of Spider needs, from config.json: the Slack channel it posts to, the Keychain
-    item (service and account) holding its bot token, the IANA time zone its slots and dates are in, and the
-    reader's name the judge's prompt writes to. A missing, unknown or empty key, or a zone this Mac's zoneinfo
-    doesn't know, raises ValueError, so a bad edit fails the install, never a run."""
+    item (service and account) holding its bot token, and the IANA time zone its slots and dates are in. A
+    missing, unknown or empty key, or a zone this Mac's zoneinfo doesn't know, raises ValueError, so a bad edit
+    fails the install, never a run."""
     with open(path) as f:
         raw = json.load(f)
     if not isinstance(raw, dict) or set(raw) != set(CONFIG_KEYS):

@@ -1,7 +1,6 @@
 {
   "slack_channel": "C0123456789",
-  "keychain_service": "spider-slack-bot",
+  "keychain_service": "spider-slack-token",
   "keychain_account": "spider",
-  "time_zone": "UTC",
-  "reader": "Alex"
+  "time_zone": "UTC"
 }

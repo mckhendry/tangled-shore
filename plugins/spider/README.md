@@ -4,7 +4,8 @@ Spider posts one AI technology and news digest to a Slack channel at each slot i
 1:30 PM, every day, as shipped), as its own Slack app. Each post covers everything since the last successful post:
 new models, dev-tool releases, breakout papers, big business moves and new videos from the creators you follow.
 
-It runs on macOS under launchd, posts only to Slack, and needs the `claude` CLI.
+It runs on macOS under launchd, posts only to Slack, and needs the `claude` CLI. What it's for, and what it won't
+grow into, is in [`VISION.md`](VISION.md).
 
 ## How a run works
 
@@ -17,17 +18,18 @@ It runs on macOS under launchd, posts only to Slack, and needs the `claude` CLI.
    offsets differ, the run fails the slot as `mac-clock-not-time-zone` and says both offsets.
 3. **Network.** It waits up to 450 s for the network. Spider uses no keep-awake tool of any kind.
 4. **Floor** (`spider_floor.py`, no model). It pulls `sources.json` (OpenAI and Google DeepMind feeds, Claude
-   Code, Codex and Gemini CLI releases, Hacker News over 150 points, Hugging Face daily papers over 25 upvotes)
-   and one YouTube feed per creator in `creators.json`, inside the window plus a lookback (6 h for feeds, 48 h for
-   Hacker News and Hugging Face, so an item that appears late or crosses its gate late isn't lost). It normalizes
-   URLs, merges candidates that share a URL, drops any URL already posted, and records each source as ok, empty or
-   failed. Only every source failing aborts the slot.
-5. **Session** (`spider_judge.py`). One `claude -p` session on Sonnet 5.5 at high effort, in the run's folder,
-   with WebSearch and WebFetch only (its inputs are in the prompt, so it has no file tool), a 1200 s timeout that
-   kills its whole process group, a `--max-budget-usd 5` cap, and the blank `~/.claude-clean` profile. It hunts
-   for what the floor can't see, groups identical events, drops what was already posted unless the story moved,
-   and writes up to 8 items as JSON held to a schema. An answer that fails the check gets one repair prompt on the
-   same session, then the slot fails.
+   Code, Codex and Gemini CLI releases, Hacker News at 150 points or more, Hugging Face daily papers at 25
+   upvotes or more) and one YouTube feed per creator in `creators.json`, inside the window plus a lookback (6 h for
+   feeds, 48 h for Hacker News and Hugging Face, so an item that appears late or crosses its gate late isn't lost).
+   It normalizes URLs, merges candidates that share a URL, drops any URL already posted, and records each source
+   as ok, empty or failed. Only every source failing aborts the slot.
+5. **Session, the judge** (`spider_judge.py`). One `claude -p` session on Sonnet 5.5 at high effort, in the run's
+   folder, with WebSearch and WebFetch only (its inputs are in the prompt, so it has no file tool), a 1200 s
+   timeout that kills its whole process group, a `--max-budget-usd 5` flag (a cap on usage-billed logins;
+   unverified on a subscription, where the timeout is the hard stop), and the blank `~/.claude-clean` profile. It
+   hunts for what the floor can't see, groups identical events, drops what was already posted unless the story
+   moved, and writes up to 8 items as JSON held to a schema. An answer that fails the check gets one repair prompt
+   on the same session, then the slot fails.
 6. **Verify** (`spider_verify.py`, no model). Each primary link must answer HTTP 200 after redirects, or be listed
    this run by its own publisher's feed on that publisher's host, and must not have been posted before; a failing
    item is dropped. A failing discussion link is removed and its item kept.
@@ -71,7 +73,7 @@ through it).
    `keychain_service` and `keychain_account` from `config.json`:
 
    ```
-   security add-generic-password -s spider-slack-bot -a spider -w
+   security add-generic-password -s spider-slack-token -a spider -w
    ```
 
    With `-w` last and no value, `security` prompts for the token, so it never lands in your shell history.
@@ -84,19 +86,18 @@ through it).
 
    then run `/login` and quit. Without it, the judge's session can't start work, and each slot fails with a
    `judge:` reason.
-5. **Edit the settings** (all strings) in `config.json`:
+5. **Edit the settings** (all strings) in `config.json`. Every value it ships with is an example to replace:
    - `slack_channel`: the channel id from step 2.
    - `keychain_service`, `keychain_account`: the Keychain item from step 3.
-   - `time_zone`: your IANA zone, such as `America/New_York`. It ships as `UTC`, so a Mac on any other zone fails
-     every slot until you set it.
-   - `reader`: the name the judge writes to (it writes to you as "you", never by name).
+   - `time_zone`: your IANA zone, such as `America/New_York`. It ships as `UTC`, so a Mac whose clock isn't at
+     UTC's offset fails every slot until you set it.
 
    The loader refuses a missing, extra or empty key, or a zone your Mac doesn't know. Then edit `taste.md`,
    `creators.json` (one `{"name", "channel_id"}` per YouTube channel) and, if you like, `schedule.json`.
 6. **Install.** Run `./install.sh`. It refuses when the Keychain holds no Spider token, copies the files to
    `~/.local/share/spider`, and loads the launchd job `com.tangled-shore.spider`. It does not run Spider; the first
    post comes at the next slot. Re-run it after any edit. `./uninstall.sh` removes the job and the copied files
-   and keeps the state.
+   and keeps the state, except its install-time record.
 
 To see a post before any goes out, run a dry run (below).
 
